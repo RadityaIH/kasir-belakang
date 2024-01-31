@@ -39,3 +39,5 @@ import authRoutes from './app/routes/auth.routes.js';
 authRoutes(app);
 import profileRoutes from "./app/routes/profile.routes.js";
 profileRoutes(app);
+import customerRoutes from "./app/routes/customer.routes.js";
+customerRoutes(app);

@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken'
-import db from '../../db/db.js'
 import dotenv from "dotenv";
 import crypto from 'crypto'
 import * as queries from '../models/profile.model.js';
