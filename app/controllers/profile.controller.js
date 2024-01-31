@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import db from '../../db/db.js'
 import dotenv from "dotenv";
 import crypto from 'crypto'
+import * as queries from '../models/profile.model.js';
 
 dotenv.config();
 
@@ -18,9 +19,7 @@ export const getUser = (req, res) => {
         const decoded = jwt.verify(token, SECRET);
         const userId = decoded.userId
 
-        const sql = `SELECT u.username, u.nama, r.namarole FROM users u JOIN role r WHERE u.idrole = r.idrole AND u.id = ${userId};`
-
-        db.query(sql, (err, result) => {
+        queries.getUserQ(userId, (err, result) => {
             if (err) {
                 return res.status(500).json({ error: "Internal Server Error"});
             }
@@ -52,8 +51,7 @@ export const updateUser = (req, res) => {
         if (password_lama || password_baru) {
             const hashedPassword = crypto.createHash('md5').update(password_lama).digest('hex');
     
-            const sql = `SELECT password FROM users WHERE BINARY password = ? AND id = ${userId}`
-            db.query(sql, [hashedPassword], (err, result) => {
+            queries.checkUserPassandIdQ(userId, hashedPassword, (err, result) => {
                 if (err) {
                     return res.status(500).json({ error: "Internal Server Error"});
                 }
@@ -64,8 +62,7 @@ export const updateUser = (req, res) => {
     
                 const hashedNewPassword = crypto.createHash('md5').update(password_baru).digest('hex');
     
-                const updtSql = `UPDATE users SET username = ?, nama = ?, password = ? WHERE id = ${userId}`
-                db.query(updtSql, [username, nama_lengkap, hashedNewPassword], (err, result) => {
+                queries.updateUserWithPasswordQ(userId, username, nama_lengkap, hashedNewPassword, (err, result) => {
                     if (err) {
                         return res.status(500).json({ error: "Internal Server Error"});
                     }
@@ -74,8 +71,7 @@ export const updateUser = (req, res) => {
                 })
             })
         } else {
-            const updtSql = `UPDATE users SET username = ?, nama = ? WHERE id = ${userId}`
-            db.query(updtSql, [username, nama_lengkap], (err, result) => {
+            queries.updateUserQ(userId, username, nama_lengkap, (err, result) => {
                 if (err) {
                     return res.status(500).json({ error: "Internal Server Error"});
                 }
