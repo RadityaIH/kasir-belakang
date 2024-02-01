@@ -11,7 +11,10 @@ export function updateCustQ(id, nama, alamat, no_telp, callback) {
     db.query(sql, [nama, alamat, no_telp, id], callback);
 }
 
-export function addCustQ(nama, alamat, no_telp, callback) {
-    const sql = `INSERT INTO customer (nama_cust, alamat, no_telp) VALUES (?, ?, ?)`;
-    db.query(sql, [nama, alamat, no_telp], callback);
+export function addCustQ(nama, alamat, no_telp
+, callback) {
+    const sql = `INSERT INTO customer (nama_cust, alamat, no_telp
+    ) VALUES (?, ?, ?)`;
+    db.query(sql, [nama, alamat, no_telp
+    ], callback);
 }
