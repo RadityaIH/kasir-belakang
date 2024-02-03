@@ -43,3 +43,5 @@ import customerRoutes from "./app/routes/customer.routes.js";
 customerRoutes(app);
 import salesRoutes from "./app/routes/sales.routes.js";
 salesRoutes(app);
+import salesOrderRoutes from "./app/routes/salesorder.routes.js";
+salesOrderRoutes(app);
