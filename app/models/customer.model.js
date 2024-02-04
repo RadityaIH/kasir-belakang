@@ -18,3 +18,5 @@ export function addCustQ(nama, alamat, no_telp
     db.query(sql, [nama, alamat, no_telp
     ], callback);
 }
+
+/** */

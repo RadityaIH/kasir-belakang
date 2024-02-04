@@ -1,19 +1,27 @@
 import db from '../../db/db.js'
 
-export function insertSOQ() {
+export function insertSOQ(id_SO, customer_id, sales_id, tanggal_transaksi,
+    jadwal_kirim, total_harga, metode_dp1, total_dp1,
+    metode_dp2, total_dp2, balance_due, status_terima, callback) {
     const sql = `INSERT INTO  salesorder 
                 ( id_SO, customer_id, sales_id, tanggal_transaksi, 
                 jadwal_kirim, total_harga, metode_dp1, total_dp1, 
                 metode_dp2, total_dp2, balance_due, status_terima) 
-                VALUES ('?','?','?','?',
-                '?','?','?','?',
-                ?,?,'?','?')`;
+                VALUES ( ?, ?, ?, ?,
+                 ?, ?, ?, ?,
+                 ?, ?, ?, ?)`;
+
+    db.query(sql, [id_SO, customer_id, sales_id, tanggal_transaksi,
+        jadwal_kirim, total_harga, metode_dp1, total_dp1,
+        metode_dp2, total_dp2, balance_due, status_terima], callback);
 }
 
-export function insertSOProductQ() {
+export function insertSOProductQ(d_SO, nama_produk, kode_produk, harga, qty, remarks, callback) {
     const sql = `INSERT INTO salesorder_detail
                 (id_SO, nama_produk, kode_produk, harga_item_ppn, qty, remarks) 
                 VALUES (?, ?, ?, ?, ?, ?)`
+    
+    db.query(sql, [d_SO, nama_produk, kode_produk, harga, qty, remarks], callback);
 }
 
 export function getSOQ(callback) {
@@ -31,3 +39,14 @@ export function getSOQ(callback) {
 
     db.query(sql, callback);
 }   
+
+export function getCustIdQ(nama_cust, alamat, no_telp, callback) {
+    const sql = `SELECT id FROM customer WHERE nama_cust = ? AND alamat = ? AND no_telp = ?;`
+
+    db.query(sql, [nama_cust, alamat, no_telp], callback);
+}
+
+export function getMaxIDSOQ(callback) {
+    const sql = `SELECT MAX(id_SO) AS maxIDSO FROM salesorder;`;
+    db.query(sql, callback);
+}
