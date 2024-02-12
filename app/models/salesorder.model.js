@@ -52,7 +52,7 @@ export function getMaxIDSOQ(callback) {
 }
 
 export function countNotDeliveredQ(callback) {
-    const sql = `SELECT COUNT(id_SO) FROM salesorder WHERE status_terima = 0`
+    const sql = `SELECT COUNT(id_SO) AS total_orders FROM salesorder WHERE status_terima = 0`
 
     db.query(sql, callback);
 }   
