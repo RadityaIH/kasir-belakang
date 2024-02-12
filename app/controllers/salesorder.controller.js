@@ -74,10 +74,10 @@ export const addSO = (req, res) => {
 
 }
 
-export const getSOFiltered = (req, res) => {
+export const countNotDelivered = (req, res) => {
     const token = req.cookies.token
 
-    queries.getSOFilteredQ((err, result) => {
+    queries.countNotDeliveredQ((err, result) => {
         if (err) {
             return res.status(500).json({ error: "Internal Server Error" });
         }
