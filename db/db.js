@@ -16,10 +16,10 @@ const options = {
 const db = mysql.createConnection(options)
 
 // const db = mysql.createConnection({
-//     host: "gateway01.ap-southeast-1.prod.aws.tidbcloud.com", 
-//     user: "NwcVrKHz8mQUFbQ.root", 
-//     password: "", 
-//     database: "kasir"
+//     host: "localhost", 
+    // user: "root", 
+    // password: "", 
+    // database: "kasir"
 // })
 
 export default db
