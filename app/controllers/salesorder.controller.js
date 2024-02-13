@@ -85,3 +85,26 @@ export const countNotDelivered = (req, res) => {
         res.json(result)
     })
 }
+
+export const setDelivered = (req, res) => {
+    const id_SO = req.params.id_SO;
+    const status = req.body.status;
+
+    if (status === 1) {
+        queries.setDeliveredQ(id_SO, (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+
+            res.json({ success: true, message: "Set Delivered Success" })
+        })
+    } else if (status === 0) {
+        queries.setNotDeliveredQ(id_SO, (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+
+            res.json({ success: true, message: "Set Not Delivered Success" })
+        })
+    }
+}

@@ -56,3 +56,15 @@ export function countNotDeliveredQ(callback) {
 
     db.query(sql, callback);
 }   
+
+export function setDeliveredQ(id_SO, callback) {
+    const sql = `UPDATE salesorder SET status_terima = 1 WHERE id_SO = ?`
+
+    db.query(sql, [id_SO], callback);
+}
+
+export function setNotDeliveredQ(id_SO, callback) {
+    const sql = `UPDATE salesorder SET status_terima = 0 WHERE id_SO = ?`
+
+    db.query(sql, [id_SO], callback);
+}
