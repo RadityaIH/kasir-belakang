@@ -67,7 +67,7 @@ export const addSO = (req, res) => {
                             })
                         }
                     }
-                    res.json({ success: true, message: "Add Sales Order Success", id_SO: id_SO} )
+                    res.json({ success: true, message: "Add Sales Order Success", id_SO: id_SO })
                 })
         })
     })
@@ -107,4 +107,28 @@ export const setDelivered = (req, res) => {
             res.json({ success: true, message: "Set Not Delivered Success" })
         })
     }
+}
+
+export const deleteSO = (req, res) => {
+    const token = req.cookies.token
+    const id_SO = req.params.id_SO;
+
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized" })
+    }
+
+    queries.deleteSOProdQ(id_SO, (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        queries.deleteSOQ(id_SO, (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+        })
+
+        res.json({ success: true, message: "Delete Sales Order Success" })
+    })
+
 }

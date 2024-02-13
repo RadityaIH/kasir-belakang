@@ -68,3 +68,15 @@ export function setNotDeliveredQ(id_SO, callback) {
 
     db.query(sql, [id_SO], callback);
 }
+
+export function deleteSOProdQ(id_SO, callback) {
+    const sql = 'DELETE FROM salesorder_detail WHERE id_SO = ?'
+
+    db.query(sql, [id_SO], callback);
+}
+
+export function deleteSOQ(id_SO, callback) {
+    const sql = 'DELETE FROM salesorder WHERE id_SO = ?'
+
+    db.query(sql, [id_SO], callback);
+}
