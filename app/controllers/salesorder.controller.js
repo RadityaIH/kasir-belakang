@@ -1,4 +1,5 @@
 import * as queries from '../models/salesorder.model.js'
+import * as custQueries from '../models/customer.model.js'
 
 export const getSO = (req, res) => {
     const token = req.cookies.token
@@ -117,18 +118,33 @@ export const deleteSO = (req, res) => {
         return res.status(401).json({ error: "Unauthorized" })
     }
 
-    queries.deleteSOProdQ(id_SO, (err, result) => {
+    queries.getCustIdBySOQ(id_SO, (err, result) => {
         if (err) {
-            return res.status(500).json({ error: "Internal Server Error" });
+            return res.status(500).json({ error: "Internal Server Error 1" });
         }
 
-        queries.deleteSOQ(id_SO, (err, result) => {
-            if (err) {
-                return res.status(500).json({ error: "Internal Server Error" });
-            }
-        })
+        const customer_id = result[0].customer_id;
 
-        res.json({ success: true, message: "Delete Sales Order Success" })
+        queries.deleteSOProdQ(id_SO, (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: "Internal Server Error 3" });
+            }
+
+            queries.deleteSOQ(id_SO, (err, result) => {
+                if (err) {
+                    return res.status(500).json({ error: "Internal Server Error 4" });
+                }
+
+                custQueries.deleteCustByIDQ(customer_id, (err, result) => {
+                    if (err) {
+                        return res.status(500).json({ error: "Internal Server Error 2" });
+                    }
+                })
+
+                res.json({ success: true, message: "Delete Sales Order Success" })
+            })
+        })
     })
+
 
 }

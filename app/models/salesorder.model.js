@@ -80,3 +80,9 @@ export function deleteSOQ(id_SO, callback) {
 
     db.query(sql, [id_SO], callback);
 }
+
+export function getCustIdBySOQ(id_SO, callback) {
+    const sql = `SELECT customer_id FROM salesorder WHERE id_SO = ?`
+
+    db.query(sql, [id_SO], callback);
+}

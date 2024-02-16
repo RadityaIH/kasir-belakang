@@ -19,4 +19,7 @@ export function addCustQ(nama, alamat, no_telp
     ], callback);
 }
 
-/** */
+export function deleteCustByIDQ(id, callback) {
+    const sql = `DELETE FROM customer WHERE id = ?`;
+    db.query(sql, [id], callback);
+}
