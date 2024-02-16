@@ -6,6 +6,7 @@ const salesorderRoutes = (app) => {
     app.get('/getNotDelivered', controller.countNotDelivered)
     app.put('/setDelivered/:id_SO', controller.setDelivered)
     app.delete('/deleteSO/:id_SO', controller.deleteSO)
+    app.get('/getSOById/:id_SO', controller.getSOById)
 }
 
 export default salesorderRoutes

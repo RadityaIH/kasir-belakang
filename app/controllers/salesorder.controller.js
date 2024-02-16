@@ -1,5 +1,6 @@
 import * as queries from '../models/salesorder.model.js'
 import * as custQueries from '../models/customer.model.js'
+import axios from 'axios'
 
 export const getSO = (req, res) => {
     const token = req.cookies.token
@@ -13,12 +14,23 @@ export const getSO = (req, res) => {
     })
 }
 
+const decreaseProductStock = async (idProduct, qty) => {
+    try {
+        await axios.put(`https://gudang-back-end.vercel.app/products/transferStock/${idProduct}`, {
+            stok: qty
+        });
+    } catch (error) {
+        console.error("Error decreasing product stock:", error);
+        throw new Error("Error decreasing product stock");
+    }
+}
+
 export const addSO = (req, res) => {
     const token = req.cookies.token
     const { nama_cust, no_telp, alamat, sales_id,
         jadwal_kirim, total_harga, metode_dp1, total_dp1,
         balance_due, produkPage2 } = req.body;
-
+    console.log(produkPage2)
     if (!token) {
         return res.status(401).json({ error: "Unauthorized" })
     }
@@ -64,7 +76,13 @@ export const addSO = (req, res) => {
                                 if (err) {
                                     return res.status(500).json({ error: "Internal Server Error" });
                                 }
-                                completedRequests++;
+                                // completedRequests++; //Janlup matiin
+                                try {
+                                    decreaseProductStock(product.id_produk, product.qty);
+                                    completedRequests++;
+                                } catch (error) {
+                                    return res.status(500).json({ error: "Error decreasing product stock" });
+                                }
                             })
                         }
                     }
@@ -145,6 +163,21 @@ export const deleteSO = (req, res) => {
             })
         })
     })
+}
 
+export const getSOById = (req, res) => {
+    const token = req.cookies.token
+    const id_SO = req.params.id_SO;
 
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized" })
+    }
+
+    queries.getSOByIdQ(id_SO, (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        res.json(result)
+    })
 }
