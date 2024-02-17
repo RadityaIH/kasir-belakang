@@ -224,3 +224,19 @@ export const getSalesResult = (req, res) => {
         res.json(result)
     })
 }
+
+export const getSOperDate = (req, res) => {
+    const token = req.cookies.token
+
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized" })
+    }
+
+    queries.getSOperDateQ((err, result) => {
+        if (err) {
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        res.json(result)
+    })
+}

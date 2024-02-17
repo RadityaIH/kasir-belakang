@@ -115,3 +115,9 @@ export function getSalesResultQ(id_sales, callback) {
 
     db.query(sql, [id_sales], callback);
 }
+
+export function getSOperDateQ(callback) {
+    const sql = `SELECT s.tanggal_transaksi, COUNT(s.id_SO) AS "Jumlah" FROM salesorder s GROUP BY s.tanggal_transaksi`
+
+    db.query(sql, callback);
+}

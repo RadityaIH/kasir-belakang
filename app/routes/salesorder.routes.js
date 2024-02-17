@@ -8,6 +8,7 @@ const salesorderRoutes = (app) => {
     app.delete('/deleteSO/:id_SO', controller.deleteSO)
     app.get('/getSOById/:id_SO', controller.getSOById)
     app.get('/getSalesResult/:id_sales', controller.getSalesResult)
+    app.get('/getSOperDate', controller.getSOperDate)
 }
 
 export default salesorderRoutes
