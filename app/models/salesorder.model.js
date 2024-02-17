@@ -16,12 +16,12 @@ export function insertSOQ(id_SO, customer_id, sales_id, tanggal_transaksi,
         metode_dp2, total_dp2, balance_due, status_terima], callback);
 }
 
-export function insertSOProductQ(d_SO, nama_produk, kode_produk, harga, qty, remarks, callback) {
+export function insertSOProductQ(d_SO, id_product, nama_produk, kode_produk, harga, qty, remarks, callback) {
     const sql = `INSERT INTO salesorder_detail
-                (id_SO, nama_produk, kode_produk, harga_item_ppn, qty, remarks) 
-                VALUES (?, ?, ?, ?, ?, ?)`
+                (id_SO, id_product, nama_produk, kode_produk, harga_item_ppn, qty, remarks) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)`
     
-    db.query(sql, [d_SO, nama_produk, kode_produk, harga, qty, remarks], callback);
+    db.query(sql, [d_SO, id_product, nama_produk, kode_produk, harga, qty, remarks], callback);
 }
 
 export function getSOQ(callback) {
@@ -100,6 +100,12 @@ export function deleteSOQ(id_SO, callback) {
 
 export function getCustIdBySOQ(id_SO, callback) {
     const sql = `SELECT customer_id FROM salesorder WHERE id_SO = ?`
+
+    db.query(sql, [id_SO], callback);
+}
+
+export function getIdProduct(id_SO, callback) {
+    const sql = `SELECT id_product, qty FROM salesorder_detail WHERE id_SO = ?`
 
     db.query(sql, [id_SO], callback);
 }

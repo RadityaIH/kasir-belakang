@@ -72,7 +72,7 @@ export const addSO = (req, res) => {
                     else {
                         let completedRequests = 0;
                         for (const product of produkPage2) {
-                            queries.insertSOProductQ(id_SO, product.nama_produk, product.kode_produk, product.harga, product.qty, product.remarks, (err, result) => {
+                            queries.insertSOProductQ(id_SO, product.id_produk, product.nama_produk, product.kode_produk, product.harga, product.qty, product.remarks, (err, result) => {
                                 if (err) {
                                     return res.status(500).json({ error: "Internal Server Error" });
                                 }
@@ -94,8 +94,6 @@ export const addSO = (req, res) => {
 }
 
 export const countNotDelivered = (req, res) => {
-    const token = req.cookies.token
-
     queries.countNotDeliveredQ((err, result) => {
         if (err) {
             return res.status(500).json({ error: "Internal Server Error" });
@@ -128,6 +126,17 @@ export const setDelivered = (req, res) => {
     }
 }
 
+const increaseProductStock = async (idProduct, qty) => {
+    try {
+        await axios.put(`https://gudang-back-end.vercel.app/products/addStock/${idProduct}`, {
+            stok: qty
+        });
+    } catch (error) {
+        console.error("Error increasing product stock:", error);
+        throw new Error("Error increasing product stock");
+    }
+}
+
 export const deleteSO = (req, res) => {
     const token = req.cookies.token
     const id_SO = req.params.id_SO;
@@ -143,25 +152,41 @@ export const deleteSO = (req, res) => {
 
         const customer_id = result[0].customer_id;
 
-        queries.deleteSOProdQ(id_SO, (err, result) => {
+        queries.getIdProduct(id_SO, (err, result) => {
             if (err) {
-                return res.status(500).json({ error: "Internal Server Error 3" });
+                return res.status(500).json({ error: "Internal Server Error 1" });
             }
 
-            queries.deleteSOQ(id_SO, (err, result) => {
+            const id_products = result;
+            id_products.forEach(row => {
+                try {
+                    increaseProductStock(row.id_product, row.qty);
+                } catch (error) {
+                    return res.status(500).json({ error: "Error decreasing product stock" });
+                }
+            });
+
+            queries.deleteSOProdQ(id_SO, (err, result) => {
                 if (err) {
-                    return res.status(500).json({ error: "Internal Server Error 4" });
+                    return res.status(500).json({ error: "Internal Server Error 3" });
                 }
 
-                custQueries.deleteCustByIDQ(customer_id, (err, result) => {
+                queries.deleteSOQ(id_SO, (err, result) => {
                     if (err) {
-                        return res.status(500).json({ error: "Internal Server Error 2" });
+                        return res.status(500).json({ error: "Internal Server Error 4" });
                     }
-                })
 
-                res.json({ success: true, message: "Delete Sales Order Success" })
+                    custQueries.deleteCustByIDQ(customer_id, (err, result) => {
+                        if (err) {
+                            return res.status(500).json({ error: "Internal Server Error 2" });
+                        }
+                    })
+
+                    res.json({ success: true, message: "Delete Sales Order Success" })
+                })
             })
         })
+
     })
 }
 
