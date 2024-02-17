@@ -34,8 +34,8 @@ export const getSalesAll = (req, res) => {
 
 export const getSalesAllByDate = (req, res) => {
     const token = req.cookies.token
-    const dateStart = req.body.dateStart
-    const dateEnd = req.body.dateEnd
+    const dateStart = req.query.dateStart
+    const dateEnd = req.query.dateEnd
 
     if (!token) {
         return res.status(401).json({ error: "Unauthorized"})
@@ -47,5 +47,23 @@ export const getSalesAllByDate = (req, res) => {
         }
 
         res.json(result)
+    })
+    console.log(dateStart, dateEnd)
+}
+
+export const addSales = (req, res) => {
+    const token = req.cookies.token
+    const nama_sales = req.body.nama_sales
+
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized"})
+    }
+
+    queries.addSalesQ(nama_sales, (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: "Internal Server Error"});
+        }
+
+        res.json({ success: true, message: "Add Sales Success" })
     })
 }
