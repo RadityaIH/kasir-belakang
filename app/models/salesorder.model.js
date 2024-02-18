@@ -121,3 +121,27 @@ export function getSOperDateQ(callback) {
 
     db.query(sql, callback);
 }
+
+export function getSOperDateperSalesQ(id_sales, callback) {
+    const sql = `SELECT s.tanggal_transaksi, COUNT(s.id_SO) AS "Jumlah" FROM salesorder s WHERE s.sales_id = ? GROUP BY s.tanggal_transaksi`
+
+    db.query(sql, [id_sales], callback);
+}
+
+export function getSOProdByIdSOQ(id_SO, callback) {
+    const sql = `SELECT id, qty, id_product FROM salesorder_detail WHERE id_SO = ?`
+
+    db.query(sql, [id_SO], callback);
+}
+
+export function updateSOProdQ(id, id_product, nama_produk, kode_produk, harga, qty, remarks, callback) {
+    const sql = `UPDATE salesorder_detail SET id_product = ?, nama_produk = ?, kode_produk = ?, harga_item_ppn = ?, qty = ?, remarks = ? WHERE id = ?`
+
+    db.query(sql, [id_product, nama_produk, kode_produk, harga, qty, remarks, id], callback);
+}
+
+export function updateSOQ(id_SO, total_harga, balance_due, callback) {
+    const sql = `UPDATE salesorder SET total_harga = ?, balance_due = ? WHERE id_SO = ?`
+
+    db.query(sql, [total_harga, balance_due, id_SO], callback);
+}

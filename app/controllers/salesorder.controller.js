@@ -30,7 +30,6 @@ export const addSO = (req, res) => {
     const { nama_cust, no_telp, alamat, sales_id,
         jadwal_kirim, total_harga, metode_dp1, total_dp1,
         balance_due, produkPage2 } = req.body;
-    console.log(produkPage2)
     if (!token) {
         return res.status(401).json({ error: "Unauthorized" })
     }
@@ -158,7 +157,7 @@ export const deleteSO = (req, res) => {
             }
 
             const id_products = result;
-            //Matiin
+            // Matiin
             id_products.forEach(row => {
                 try {
                     increaseProductStock(row.id_product, row.qty);
@@ -238,5 +237,81 @@ export const getSOperDate = (req, res) => {
         }
 
         res.json(result)
+    })
+}
+
+export const getSOperDateperSales = (req, res) => {
+    const token = req.cookies.token
+    const sales_id = req.params.sales_id;
+
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized" })
+    }
+
+    queries.getSOperDateperSalesQ(sales_id, (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        res.json(result)
+    })
+}
+
+export const updateSO = (req, res) => {
+    const token = req.cookies.token
+    const id_SO = req.params.id_SO;
+    const { produkPage2, total_harga, balance_due, productChanged } = req.body;
+
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized" })
+    }
+
+    queries.updateSOQ(id_SO, total_harga, balance_due, (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: "Internal Server Error" });
+        } else {
+            if (productChanged) {
+                queries.getSOProdByIdSOQ(id_SO, async (err, result) => {
+                    if (err) {
+                        return res.status(500).json({ error: "Internal Server Error" });
+                    }
+                    const idSOProd = result;
+
+                    try {
+                        for (let i = 0; i < produkPage2.length; i++) {
+                            const product = produkPage2[i];
+                            const idProd = idSOProd[i].id; // Dapatkan id produk dari salesorder_detail
+
+                            // Bandingkan jumlah produk di produkPage2 dengan yang ada di database
+                            const existingQty = idSOProd[i].qty;
+                            const newQty = product.qty;
+                            const qtyDifference = newQty - existingQty;
+
+                            // Update stok di gudang
+                            if (qtyDifference > 0) {
+                                // Jika qty bertambah, panggil fungsi untuk menambah stok
+                                await decreaseProductStock(product.id_produk, Math.abs(qtyDifference));
+                            } else if (qtyDifference < 0) {
+                                // Jika qty berkurang, panggil fungsi untuk mengurangi stok
+                                await increaseProductStock(product.id_produk, qtyDifference);
+                            }
+
+                            // Update detail pesanan
+                            queries.updateSOProdQ(idProd, product.id_produk, product.nama_produk, product.kode_produk, product.harga, product.qty, product.remarks, (err, result) => {
+                                if (err) {
+                                    return res.status(500).json({ error: "Internal Server Error" });
+                                }
+                            });
+                        }
+
+                        res.json({ success: true, message: "Update Sales Order Product Success" });
+                    } catch (error) {
+                        return res.status(500).json({ error: "Internal Server Error" });
+                    }
+                })
+            } else {
+                res.json({ success: true, message: "Update Sales Order Success" });
+            }
+        }
     })
 }

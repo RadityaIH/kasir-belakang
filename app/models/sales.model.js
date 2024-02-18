@@ -7,13 +7,13 @@ export function getSalesQ(callback) {
 }
 
 export function getSalesAllQ(callback) {
-    const sql = `SELECT ss.id_sales, ss.nama_sales AS "Nama", COUNT(so.id_SO) AS "Penjualan" FROM sales ss LEFT JOIN salesorder so ON ss.id_sales = so.sales_id GROUP BY so.sales_id`;
+    const sql = `SELECT ss.id_sales, ss.nama_sales AS "Nama", COUNT(so.id_SO) AS "Penjualan" FROM sales ss LEFT JOIN salesorder so ON ss.id_sales = so.sales_id GROUP BY ss.id_sales, ss.nama_sales`;
 
     db.query(sql, callback);
 }
 
 export function getSalesAllByDateQ(dateStart, dateEnd, callback) {
-    const sql = `SELECT ss.id_sales, ss.nama_sales AS "Nama", COUNT(so.id_SO) AS "Penjualan" FROM sales ss LEFT JOIN salesorder so ON ss.id_sales = so.sales_id WHERE so.tanggal_transaksi BETWEEN ? AND ? GROUP BY so.sales_id`;
+    const sql = `SELECT ss.id_sales, ss.nama_sales AS "Nama", COUNT(so.id_SO) AS "Penjualan" FROM sales ss LEFT JOIN salesorder so ON ss.id_sales = so.sales_id WHERE so.tanggal_transaksi BETWEEN ? AND ? GROUP BY ss.id_sales, ss.nama_sales`;
 
     db.query(sql, [dateStart, dateEnd], callback);
 }
