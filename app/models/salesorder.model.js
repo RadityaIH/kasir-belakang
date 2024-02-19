@@ -145,3 +145,9 @@ export function updateSOQ(id_SO, total_harga, balance_due, callback) {
 
     db.query(sql, [total_harga, balance_due, id_SO], callback);
 }
+
+export function deleteSOProdByIdQ(id, callback) {
+    const sql = `DELETE FROM salesorder_detail WHERE id = ?`
+
+    db.query(sql, [id], callback);
+}

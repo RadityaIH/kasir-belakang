@@ -2,6 +2,29 @@ import * as queries from '../models/salesorder.model.js'
 import * as custQueries from '../models/customer.model.js'
 import axios from 'axios'
 
+const decreaseProductStock = async (idProduct, qty) => {
+    try {
+        await axios.put(`https://gudang-back-end.vercel.app/products/transferStock/${idProduct}`, {
+            stok: qty
+        });
+    } catch (error) {
+        console.error("Error decreasing product stock:", error);
+        throw new Error("Error decreasing product stock");
+    }
+}
+
+
+const increaseProductStock = async (idProduct, qty) => {
+    try {
+        await axios.put(`https://gudang-back-end.vercel.app/products/addStock/${idProduct}`, {
+            stok: qty
+        });
+    } catch (error) {
+        console.error("Error increasing product stock:", error);
+        throw new Error("Error increasing product stock");
+    }
+}
+
 export const getSO = (req, res) => {
     const token = req.cookies.token
 
@@ -14,16 +37,6 @@ export const getSO = (req, res) => {
     })
 }
 
-const decreaseProductStock = async (idProduct, qty) => {
-    try {
-        await axios.put(`https://gudang-back-end.vercel.app/products/transferStock/${idProduct}`, {
-            stok: qty
-        });
-    } catch (error) {
-        console.error("Error decreasing product stock:", error);
-        throw new Error("Error decreasing product stock");
-    }
-}
 
 export const addSO = (req, res) => {
     const token = req.cookies.token
@@ -75,7 +88,7 @@ export const addSO = (req, res) => {
                                 if (err) {
                                     return res.status(500).json({ error: "Internal Server Error" });
                                 }
-                                // completedRequests++; //Janlup matiin
+                                // completedRequests++; //Matiin
                                 try {
                                     decreaseProductStock(product.id_produk, product.qty);
                                     completedRequests++;
@@ -92,49 +105,98 @@ export const addSO = (req, res) => {
 
 }
 
-export const countNotDelivered = (req, res) => {
-    queries.countNotDeliveredQ((err, result) => {
+export const updateSO = (req, res) => {
+    const token = req.cookies.token;
+    const id_SO = req.params.id_SO;
+    const { produkPage2, total_harga, balance_due, productChanged } = req.body;
+
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    queries.updateSOQ(id_SO, total_harga, balance_due, async (err, result) => {
         if (err) {
             return res.status(500).json({ error: "Internal Server Error" });
         }
 
-        res.json(result)
-    })
-}
+        if (productChanged) {
+            queries.getSOProdByIdSOQ(id_SO, async (err, result) => {
+                if (err) {
+                    return res.status(500).json({ error: "Internal Server Error" });
+                }
+                const existingProducts = result;
 
-export const setDelivered = (req, res) => {
-    const id_SO = req.params.id_SO;
-    const status = req.body.status;
+                try {
+                    for (let i = 0; i < existingProducts.length; i++) {
+                        const existingProduct = existingProducts[i];
+                        const matchedProduct = produkPage2.find(product => product.id_produk === existingProduct.id_product);
 
-    if (status === 1) {
-        queries.setDeliveredQ(id_SO, (err, result) => {
-            if (err) {
-                return res.status(500).json({ error: "Internal Server Error" });
-            }
+                        if (matchedProduct) {
+                            const qtyDifference = matchedProduct.qty - existingProduct.qty;
 
-            res.json({ success: true, message: "Set Delivered Success" })
-        })
-    } else if (status === 0) {
-        queries.setNotDeliveredQ(id_SO, (err, result) => {
-            if (err) {
-                return res.status(500).json({ error: "Internal Server Error" });
-            }
+                            // Update stok di gudang
+                            if (qtyDifference !== 0) {
+                                if (qtyDifference > 0) {
+                                    // Jika qty berkurang, panggil fungsi untuk mengurangi stok
+                                    await decreaseProductStock(existingProduct.id_product, Math.abs(qtyDifference));
+                                } else {
+                                    // Jika qty bertambah, panggil fungsi untuk menambah stok
+                                    await increaseProductStock(existingProduct.id_product, Math.abs(qtyDifference));
+                                }
+                            }
 
-            res.json({ success: true, message: "Set Not Delivered Success" })
-        })
-    }
-}
+                            // Update detail pesanan
+                            queries.updateSOProdQ(existingProduct.id, matchedProduct.id_produk, matchedProduct.nama_produk, matchedProduct.kode_produk, matchedProduct.harga, matchedProduct.qty, matchedProduct.remarks, (err, result) => {
+                                if (err) {
+                                    console.error("Error updating sales order product:", err);
+                                    return res.status(500).json({ error: "Internal Server Error" });
+                                }
+                            });
+                        } else {
+                            // Jika produk tidak ditemukan di produkPage2, maka itu dihapus
+                            // Kembalikan stok ke gudang
+                            await increaseProductStock(existingProduct.id_product, existingProduct.qty);
 
-const increaseProductStock = async (idProduct, qty) => {
-    try {
-        await axios.put(`https://gudang-back-end.vercel.app/products/addStock/${idProduct}`, {
-            stok: qty
-        });
-    } catch (error) {
-        console.error("Error increasing product stock:", error);
-        throw new Error("Error increasing product stock");
-    }
-}
+                            // Hapus produk dari detail pesanan
+                            queries.deleteSOProdByIdQ(existingProduct.id, (err, result) => {
+                                if (err) {
+                                    console.error("Error deleting sales order product:", err);
+                                    return res.status(500).json({ error: "Internal Server Error" });
+                                }
+                            });
+                        }
+                    }
+
+                    // Produk baru ditambahkan
+                    for (let i = 0; i < produkPage2.length; i++) {
+                        const newProduct = produkPage2[i];
+                        const matchedExistingProduct = existingProducts.find(product => product.id_product === newProduct.id_produk);
+
+                        if (!matchedExistingProduct) {
+                            // Tambahkan produk baru ke detail pesanan
+                            queries.insertSOProductQ(id_SO, newProduct.id_produk, newProduct.nama_produk, newProduct.kode_produk, newProduct.harga, newProduct.qty, newProduct.remarks, (err, result) => {
+                                if (err) {
+                                    console.error("Error adding new sales order product:", err);
+                                    return res.status(500).json({ error: "Internal Server Error" });
+                                }
+                            });
+
+                            // Kurangi stok di gudang untuk produk baru
+                            await decreaseProductStock(newProduct.id_produk, newProduct.qty);
+                        }
+                    }
+
+                    res.json({ success: true, message: "Update Sales Order Product Success" });
+                } catch (error) {
+                    console.error("Error updating sales order:", error);
+                    return res.status(500).json({ error: "Internal Server Error" });
+                }
+            });
+        } else {
+            res.json({ success: true, message: "Update Sales Order Success" });
+        }
+    });
+};
 
 export const deleteSO = (req, res) => {
     const token = req.cookies.token
@@ -188,6 +250,39 @@ export const deleteSO = (req, res) => {
         })
 
     })
+}
+
+export const countNotDelivered = (req, res) => {
+    queries.countNotDeliveredQ((err, result) => {
+        if (err) {
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        res.json(result)
+    })
+}
+
+export const setDelivered = (req, res) => {
+    const id_SO = req.params.id_SO;
+    const status = req.body.status;
+
+    if (status === 1) {
+        queries.setDeliveredQ(id_SO, (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+
+            res.json({ success: true, message: "Set Delivered Success" })
+        })
+    } else if (status === 0) {
+        queries.setNotDeliveredQ(id_SO, (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+
+            res.json({ success: true, message: "Set Not Delivered Success" })
+        })
+    }
 }
 
 export const getSOById = (req, res) => {
@@ -254,64 +349,5 @@ export const getSOperDateperSales = (req, res) => {
         }
 
         res.json(result)
-    })
-}
-
-export const updateSO = (req, res) => {
-    const token = req.cookies.token
-    const id_SO = req.params.id_SO;
-    const { produkPage2, total_harga, balance_due, productChanged } = req.body;
-
-    if (!token) {
-        return res.status(401).json({ error: "Unauthorized" })
-    }
-
-    queries.updateSOQ(id_SO, total_harga, balance_due, (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: "Internal Server Error" });
-        } else {
-            if (productChanged) {
-                queries.getSOProdByIdSOQ(id_SO, async (err, result) => {
-                    if (err) {
-                        return res.status(500).json({ error: "Internal Server Error" });
-                    }
-                    const idSOProd = result;
-
-                    try {
-                        for (let i = 0; i < produkPage2.length; i++) {
-                            const product = produkPage2[i];
-                            const idProd = idSOProd[i].id; // Dapatkan id produk dari salesorder_detail
-
-                            // Bandingkan jumlah produk di produkPage2 dengan yang ada di database
-                            const existingQty = idSOProd[i].qty;
-                            const newQty = product.qty;
-                            const qtyDifference = newQty - existingQty;
-
-                            // Update stok di gudang
-                            if (qtyDifference > 0) {
-                                // Jika qty bertambah, panggil fungsi untuk menambah stok
-                                await decreaseProductStock(product.id_produk, Math.abs(qtyDifference));
-                            } else if (qtyDifference < 0) {
-                                // Jika qty berkurang, panggil fungsi untuk mengurangi stok
-                                await increaseProductStock(product.id_produk, qtyDifference);
-                            }
-
-                            // Update detail pesanan
-                            queries.updateSOProdQ(idProd, product.id_produk, product.nama_produk, product.kode_produk, product.harga, product.qty, product.remarks, (err, result) => {
-                                if (err) {
-                                    return res.status(500).json({ error: "Internal Server Error" });
-                                }
-                            });
-                        }
-
-                        res.json({ success: true, message: "Update Sales Order Product Success" });
-                    } catch (error) {
-                        return res.status(500).json({ error: "Internal Server Error" });
-                    }
-                })
-            } else {
-                res.json({ success: true, message: "Update Sales Order Success" });
-            }
-        }
     })
 }
