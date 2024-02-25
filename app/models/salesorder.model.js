@@ -113,7 +113,7 @@ export function getIdProduct(id_SO, callback) {
 }
 
 export function getSalesResultQ(id_sales, callback) {
-    const sql = `SELECT s.sales_id, s.tanggal_transaksi, s.id_SO, (SELECT nama_cust FROM customer c WHERE c.id = s.customer_id) AS nama_cust FROM salesorder s WHERE sales_id = ?`
+    const sql = `SELECT s.sales_id, s.tanggal_transaksi, s.id_SO, (SELECT nama_cust FROM customer c WHERE c.id = s.customer_id) AS nama_cust, s.total_harga FROM salesorder s WHERE sales_id = ?;`
 
     db.query(sql, [id_sales], callback);
 }
