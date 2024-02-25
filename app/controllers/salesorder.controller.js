@@ -134,18 +134,15 @@ export const updateSO = (req, res) => {
                         if (matchedProduct) {
                             const qtyDifference = matchedProduct.qty - existingProduct.qty;
 
-                            // Update stok di gudang
+                            //matiin
                             if (qtyDifference !== 0) {
                                 if (qtyDifference > 0) {
-                                    // Jika qty berkurang, panggil fungsi untuk mengurangi stok
                                     await decreaseProductStock(existingProduct.id_product, Math.abs(qtyDifference));
                                 } else {
-                                    // Jika qty bertambah, panggil fungsi untuk menambah stok
                                     await increaseProductStock(existingProduct.id_product, Math.abs(qtyDifference));
                                 }
                             }
 
-                            // Update detail pesanan
                             queries.updateSOProdQ(existingProduct.id, matchedProduct.id_produk, matchedProduct.nama_produk, matchedProduct.kode_produk, matchedProduct.harga, matchedProduct.qty, matchedProduct.remarks, (err, result) => {
                                 if (err) {
                                     console.error("Error updating sales order product:", err);
@@ -153,11 +150,9 @@ export const updateSO = (req, res) => {
                                 }
                             });
                         } else {
-                            // Jika produk tidak ditemukan di produkPage2, maka itu dihapus
-                            // Kembalikan stok ke gudang
+                            //matiin
                             await increaseProductStock(existingProduct.id_product, existingProduct.qty);
 
-                            // Hapus produk dari detail pesanan
                             queries.deleteSOProdByIdQ(existingProduct.id, (err, result) => {
                                 if (err) {
                                     console.error("Error deleting sales order product:", err);
@@ -167,13 +162,11 @@ export const updateSO = (req, res) => {
                         }
                     }
 
-                    // Produk baru ditambahkan
                     for (let i = 0; i < produkPage2.length; i++) {
                         const newProduct = produkPage2[i];
                         const matchedExistingProduct = existingProducts.find(product => product.id_product === newProduct.id_produk);
 
                         if (!matchedExistingProduct) {
-                            // Tambahkan produk baru ke detail pesanan
                             queries.insertSOProductQ(id_SO, newProduct.id_produk, newProduct.nama_produk, newProduct.kode_produk, newProduct.harga, newProduct.qty, newProduct.remarks, (err, result) => {
                                 if (err) {
                                     console.error("Error adding new sales order product:", err);
@@ -181,7 +174,7 @@ export const updateSO = (req, res) => {
                                 }
                             });
 
-                            // Kurangi stok di gudang untuk produk baru
+                            //matiin
                             await decreaseProductStock(newProduct.id_produk, newProduct.qty);
                         }
                     }
