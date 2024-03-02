@@ -1,7 +1,7 @@
 import db from '../../db/db.js'
 
 export function getUserQ(userId, callback) {
-    const sql = `SELECT u.username, u.nama, r.namarole FROM users u JOIN role r WHERE u.idrole = r.idrole AND u.id = ?;`;
+    const sql = `SELECT username, nama, role FROM users WHERE id = ?;`;
     db.query(sql, userId, callback);
 }
 

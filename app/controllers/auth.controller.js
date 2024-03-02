@@ -30,7 +30,7 @@ export const login = async (req, res) => {
 
         res.cookie('token', token, {httpOnly: true})
 
-        res.json({ success: true, username: username, token})
+        res.json({ success: true, username: username, role: user.role, token})
     })
 }
 

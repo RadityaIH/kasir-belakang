@@ -28,7 +28,7 @@ export const getUser = (req, res) => {
 
             const user = result[0]
 
-            res.json({ success: true, username: user.username, nama: user.nama, role: user.namarole})
+            res.json({ success: true, username: user.username, nama: user.nama, role: user.role})
         })
     } catch (error) {
         return res.status(401).json({ error: "Unauthorized"})
