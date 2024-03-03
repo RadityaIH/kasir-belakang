@@ -67,3 +67,21 @@ export const addSales = (req, res) => {
         res.json({ success: true, message: "Add Sales Success" })
     })
 }
+
+export const updateSales = (req, res) => {
+    const token = req.cookies.token
+    const id_sales = req.body.id_sales
+    const nama_sales = req.body.nama_sales
+
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized"})
+    }
+
+    queries.updateSalesQ(id_sales, nama_sales, (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: "Internal Server Error"});
+        }
+
+        res.json({ success: true, message: "Update Sales Success" })
+    })
+}

@@ -19,3 +19,18 @@ export function updateUserQ(userId, username, nama_lengkap, callback) {
     const sql = `UPDATE users SET username = ?, nama = ? WHERE id = ?`;
     db.query(sql, [username, nama_lengkap, userId], callback);
 }
+
+export function getKasirQ(callback) {
+    const sql = `SELECT id, nama, username FROM users WHERE role = 'kasir'`;
+    db.query(sql, callback);
+}
+
+export function addKasirQ(nama, username, password, callback) {
+    const sql = `INSERT INTO users (nama, username, password, role) VALUES (?, ?, ?, 'Kasir')`;
+    db.query(sql, [nama, username, password], callback);
+}
+
+export function updateKasirQ(id, nama, username, callback) {
+    const sql = `UPDATE users SET nama = ?, username = ? WHERE id = ?`;
+    db.query(sql, [nama, username, id], callback);
+}
