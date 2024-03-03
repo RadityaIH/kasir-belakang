@@ -29,3 +29,9 @@ export function updateSalesQ(id, nama_sales, callback) {
 
     db.query(sql, [nama_sales, id], callback);
 }
+
+export function deleteSalesQ(id, callback) {
+    const sql = `DELETE FROM sales WHERE id_sales = ?`;
+
+    db.query(sql, [id], callback);
+}

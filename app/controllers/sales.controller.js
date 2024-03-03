@@ -85,3 +85,20 @@ export const updateSales = (req, res) => {
         res.json({ success: true, message: "Update Sales Success" })
     })
 }
+
+export const deleteSales = (req, res) => {
+    const token = req.cookies.token
+    const id_sales = req.params.id_sales
+
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized"})
+    }
+
+    queries.deleteSalesQ(id_sales, (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: "Internal Server Error"});
+        }
+
+        res.json({ success: true, message: "Delete Sales Success" })
+    })
+}

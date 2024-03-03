@@ -6,6 +6,7 @@ const profileRoutes = (app) => {
     app.get('/getKasir', controller.getKasir)
     app.post('/addKasir', controller.addKasir)
     app.put('/updateKasir', controller.updateKasir)
+    app.delete('/deleteKasir/:id', controller.deleteKasir)
 }
 
 export default profileRoutes

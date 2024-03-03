@@ -34,3 +34,8 @@ export function updateKasirQ(id, nama, username, callback) {
     const sql = `UPDATE users SET nama = ?, username = ? WHERE id = ?`;
     db.query(sql, [nama, username, id], callback);
 }
+
+export function deleteKasirQ(id, callback) {
+    const sql = `DELETE FROM users WHERE id = ?`;
+    db.query(sql, [id], callback);
+}

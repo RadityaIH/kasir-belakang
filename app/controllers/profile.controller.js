@@ -136,3 +136,20 @@ export const updateKasir = (req, res) => {
         res.json({ success: true, message: "Update Kasir Success" })
     })
 }
+
+export const deleteKasir = (req, res) => {
+    const token = req.cookies.token
+    const id = req.params.id;
+
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized" })
+    }
+
+    queries.deleteKasirQ(id, (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        res.json({ success: true, message: "Delete Kasir Success" })
+    })
+}
