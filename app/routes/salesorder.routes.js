@@ -11,6 +11,7 @@ const salesorderRoutes = (app) => {
     app.get('/getSOperDate', controller.getSOperDate)
     app.get('/getSOperDateperSales/:sales_id', controller.getSOperDateperSales)
     app.put('/updateSO/:id_SO', controller.updateSO)
+    app.put('/setLunas/:id_SO', controller.setLunas)
 }
 
 export default salesorderRoutes

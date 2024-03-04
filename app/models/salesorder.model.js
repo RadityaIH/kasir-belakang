@@ -153,3 +153,9 @@ export function deleteSOProdByIdQ(id, callback) {
 
     db.query(sql, [id], callback);
 }
+
+export function setLunasQ(id_SO, callback) {
+    const sql = `UPDATE salesorder SET balance_due = 0 WHERE id_SO = ?`
+
+    db.query(sql, [id_SO], callback);
+}

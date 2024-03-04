@@ -344,3 +344,21 @@ export const getSOperDateperSales = (req, res) => {
         res.json(result)
     })
 }
+
+export const setLunas = (req, res) => {
+    const token = req.cookies.token
+    const id_SO = req.params.id_SO;
+    console.log(id_SO)
+
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized" })
+    }
+
+    queries.setLunasQ(id_SO, (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        res.json({ success: true, message: "Set Lunas Success" })
+    })
+}
