@@ -348,7 +348,6 @@ export const getSOperDateperSales = (req, res) => {
 export const setLunas = (req, res) => {
     const token = req.cookies.token
     const id_SO = req.params.id_SO;
-    console.log(id_SO)
 
     if (!token) {
         return res.status(401).json({ error: "Unauthorized" })
