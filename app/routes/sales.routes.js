@@ -7,6 +7,7 @@ const salesRoutes = (app) => {
     app.post('/addSales', controller.addSales)
     app.put('/updateSales', controller.updateSales)
     app.delete('/deleteSales/:id_sales', controller.deleteSales)
+    app.get('/getAllSales', controller.getAllSales)
 }
 
 export default salesRoutes
