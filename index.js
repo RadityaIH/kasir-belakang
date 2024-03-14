@@ -8,30 +8,30 @@ const app = express();
 
 import db from './db/db.js';
 
-const customCors = (req, callback) => {
-  let corsOptions;
-  const allowedOrigins = ['http://localhost:3000', 'https://kasir-depan.vercel.app'];
-  const origin = req.header('Origin');
-  
-  if (allowedOrigins.includes(origin)) {
-      corsOptions = {
-          origin: true,
-          credentials: true,
-      };
-  } else {
-      corsOptions = {
-          origin: false,
-      };
-  }
-  callback(null, corsOptions);
-};
+// const customCors = (req, callback) => {
+//   let corsOptions;
+//   const allowedOrigins = ['http://localhost:3000', 'https://kasir-depan.vercel.app'];
+//   const origin = req.header('Origin');
 
-app.use(cors(customCors));
+//   if (allowedOrigins.includes(origin)) {
+//       corsOptions = {
+//           origin: true,
+//           credentials: true,
+//       };
+//   } else {
+//       corsOptions = {
+//           origin: false,
+//       };
+//   }
+//   callback(null, corsOptions);
+// };
 
-// app.use(cors({
-//   origin: 'http://localhost:3000',
-//   credentials: true,
-// }));
+// app.use(cors(customCors));
+
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
 
 // app.use(cors())
 app.use(cookieParser());
