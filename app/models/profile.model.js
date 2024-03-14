@@ -1,7 +1,7 @@
 import db from '../../db/db.js'
 
 export function getUserQ(userId, callback) {
-    const sql = `SELECT username, nama, role FROM users WHERE id = ?;`;
+    const sql = `SELECT username, nama, role, photo_url FROM users WHERE id = ?;`;
     db.query(sql, userId, callback);
 }
 
@@ -18,6 +18,16 @@ export function updateUserWithPasswordQ(userId, username, nama_lengkap, hashedNe
 export function updateUserQ(userId, username, nama_lengkap, callback) {
     const sql = `UPDATE users SET username = ?, nama = ? WHERE id = ?`;
     db.query(sql, [username, nama_lengkap, userId], callback);
+}
+
+export function savePhotoUrlQ(userId, photoUrl, callback) {
+    const sql = `UPDATE users SET photo_url = ? WHERE id = ?`;
+    db.query(sql, [photoUrl, userId], callback);
+}
+
+export function deletePhotoUrlQ(userId, callback) {
+    const sql = `UPDATE users SET photo_url = NULL WHERE id = ?`;
+    db.query(sql, userId, callback);
 }
 
 export function getKasirQ(callback) {

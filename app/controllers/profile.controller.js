@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken'
 import dotenv from "dotenv";
 import crypto from 'crypto'
 import * as queries from '../models/profile.model.js';
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 
@@ -28,7 +30,7 @@ export const getUser = (req, res) => {
 
             const user = result[0]
 
-            res.json({ success: true, username: user.username, nama: user.nama, role: user.role })
+            res.json({ success: true, username: user.username, nama: user.nama, role: user.role, photo_url: user.photo_url })
         })
     } catch (error) {
         return res.status(401).json({ error: "Unauthorized" })
@@ -79,6 +81,65 @@ export const updateUser = (req, res) => {
             })
         }
 
+    } catch (error) {
+        return res.status(401).json({ error: "Unauthorized" })
+    }
+}
+
+export const uploadPhoto = (req, res) => {
+    const token = req.cookies.token
+    
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized" })
+    }
+    
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const photoUrl = `/uploads/${req.file.filename}`;
+    console.log(photoUrl)
+
+    try {
+        const decoded = jwt.verify(token, SECRET);
+        const userId = decoded.userId
+
+        queries.savePhotoUrlQ(userId, photoUrl, (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+
+            res.json({ success: true, message: "Upload Success" })
+        })
+    } catch (error) {
+        return res.status(401).json({ error: "Unauthorized" })
+    }
+}
+
+export const deletePhoto = (req, res) => {
+    const token = req.cookies.token
+    const { photo_url } = req.body
+
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized" })
+    }
+
+    try {
+        const decoded = jwt.verify(token, SECRET);
+        const userId = decoded.userId
+        fs.unlink(photo_url, (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+            queries.deletePhotoUrlQ(userId, (err, result) => {
+                if (err) {
+                    return res.status(500).json({ error: "Internal Server Error" });
+                }
+
+                res.json({ success: true, message: "Delete Success" });
+            });
+        });
     } catch (error) {
         return res.status(401).json({ error: "Unauthorized" })
     }

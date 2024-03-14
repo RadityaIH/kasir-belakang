@@ -3,6 +3,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 
+import multer from 'multer';
+import sharp from 'sharp';
+
 dotenv.config();
 const app = express();
 
@@ -48,14 +51,22 @@ db.connect(function(err) {
     console.log("db dah konek lur 🫡");
   });
 
-// nyoba awal
-app.get("/cekUser", (req, res) => {
-    const sql = "SELECT username FROM users";
 
-    db.query(sql, (err, result) => {
-        res.send(result);
-    })
-})
+//Multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, './uploads'); // Menyimpan file di folder 'uploads'
+  },
+  filename: function (req, file, cb) {
+      cb(null, Date.now() + '-' + file.originalname); // Memberikan nama unik untuk file
+  }
+});
+
+const upload = multer({ storage: storage });
+export default upload
+// Add this line to serve static files
+app.use('/uploads', express.static('uploads'));
+
 
 // import routing
 import authRoutes from './app/routes/auth.routes.js';
