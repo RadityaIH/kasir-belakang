@@ -116,6 +116,10 @@ export const uploadPhoto = (req, res) => {
     }
 }
 
+function changeToBackslash(path) {
+    return path.replace(/\//g, "\\");
+}
+
 export const deletePhoto = (req, res) => {
     const token = req.cookies.token
     const { photo_url } = req.body
@@ -127,7 +131,9 @@ export const deletePhoto = (req, res) => {
     try {
         const decoded = jwt.verify(token, SECRET);
         const userId = decoded.userId
-        fs.unlink(photo_url, (err) => {
+        const currentDir = path.resolve(process.cwd()); 
+        const directory = currentDir + changeToBackslash(photo_url);
+        fs.unlink(directory, (err) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ error: "Internal Server Error" });
