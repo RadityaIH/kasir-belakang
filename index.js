@@ -9,6 +9,11 @@ import sharp from 'sharp';
 dotenv.config();
 const app = express();
 
+app.get('/favicon.ico', (req, res) => {
+  res.status(204);
+});
+
+
 import db from './db/db.js';
 
 // const customCors = (req, callback) => {
