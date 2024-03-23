@@ -1,5 +1,5 @@
 import * as controller from '../controllers/profile.controller.js';
-import upload from '../../index.js'
+import { upload } from '../../index.js'
 
 const profileRoutes = (app) => {
     app.get('/getUser', controller.getUser)
