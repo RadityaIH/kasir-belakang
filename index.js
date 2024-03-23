@@ -11,6 +11,7 @@ const app = express();
 
 app.get('/favicon.ico', (req, res) => {
   res.status(204);
+  res.end();
 });
 
 
@@ -68,7 +69,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-export { upload };
+// export { upload };
 
 // Add this line to serve static files
 app.use('/uploads', express.static('uploads'));
@@ -85,3 +86,5 @@ import salesRoutes from "./app/routes/sales.routes.js";
 salesRoutes(app);
 import salesOrderRoutes from "./app/routes/salesorder.routes.js";
 salesOrderRoutes(app);
+
+export default app;
