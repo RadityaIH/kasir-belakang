@@ -11,6 +11,7 @@ const SECRET = process.env.SECRET
 
 export const getUser = (req, res) => {
     const token = req.cookies.token
+    console.log(token)
 
     if (!token) {
         return res.status(401).json({ error: "Unauthorized" })
