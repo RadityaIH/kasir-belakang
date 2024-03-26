@@ -18,7 +18,7 @@ app.get('/favicon.ico', (req, res) => {
 import db from './db/db.js';
 
 app.use(cors({
-  origin: '*',
+  origin: ['http://localhost:3000', 'https://kasir-depan.vercel.app'],
   credentials: true,
 }));
 
