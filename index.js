@@ -37,11 +37,6 @@ db.connect(function (err) {
   console.log("db dah konek lur 🫡");
 });
 
-
-app.get("/", (req, res) => {
-  console.log("Hello!")
-})
-
 //Multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
