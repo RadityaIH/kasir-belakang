@@ -29,22 +29,26 @@ app.use(express.static('public'))
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 })
 
-db.connect(function(err) {
-    if (err) throw err;
-    console.log("db dah konek lur 🫡");
-  });
+db.connect(function (err) {
+  if (err) throw err;
+  console.log("db dah konek lur 🫡");
+});
 
+
+app.get("/", (req, res) => {
+  console.log("Hello!")
+})
 
 //Multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      cb(null, './uploads'); // Menyimpan file di folder 'uploads'
+    cb(null, './uploads'); // Menyimpan file di folder 'uploads'
   },
   filename: function (req, file, cb) {
-      cb(null, Date.now() + '-' + file.originalname); // Memberikan nama unik untuk file
+    cb(null, Date.now() + '-' + file.originalname); // Memberikan nama unik untuk file
   }
 });
 
